@@ -7,7 +7,7 @@
   <meta name="description" content="Chatbot with event details, directions, menu link, RSVP via SMS, and iOS calendar invite." />
   <style>
     :root {
-      /* Subtle, party-friendly pastels */
+      /* Subtle, party-friendly pastels (address removed version) */
       --bg: #f8d7e8;        /* soft pink */
       --panel: #f1b6d1;     /* rose */
       --panel-2: #e89fbe;   /* mauve */
@@ -118,7 +118,7 @@
         <div class="card">
           <h2>Event details</h2>
           <div class="kv"><strong>When:</strong> Sat 16 Aug 2025, 6:30–9:30 PM</div>
-          <div class="kv"><strong>Where:</strong> Mimi’s, 130a Beach St, Coogee NSW 2034</div>
+          <div class="kv"><strong>Where:</strong> Mimi’s (Coogee, NSW)</div>
           <div class="kv"><strong>Dress:</strong> Smart casual</div>
           <div class="btn-row">
             <a id="mapsBtn" class="btn accent" target="_blank" rel="noopener">Open Google Maps</a>
@@ -150,8 +150,9 @@
     const EVENT = {
       title: "Leo’s Birthday Dinner @ Mimi’s",
       venue: "Mimi’s",
-      address: "Mimi’s, 130a Beach St, Coogee NSW 2034",
-      googleMapsQuery: encodeURIComponent("Mimi’s, 130a Beach St, Coogee NSW 2034"),
+      // No street address stored or displayed
+      placeHint: "Mimi’s (Coogee, NSW)",
+      googleMapsQuery: encodeURIComponent("Mimi’s Coogee NSW"),
       startLocal: new Date("2025-08-16T18:30:00+10:00"), // Australia/Sydney (AEST)
       endLocal: new Date("2025-08-16T21:30:00+10:00"),
       hostName: "Leo",
@@ -160,7 +161,7 @@
       notes: "Join us for a casual, delicious evening by the water. Please let us know any dietary needs."
     };
 
-    // Derived map links
+    // Derived map links (search/directions by place name, not address)
     const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${EVENT.googleMapsQuery}`;
     const placeLink = `https://www.google.com/maps/search/?api=1&query=${EVENT.googleMapsQuery}`;
 
@@ -169,9 +170,9 @@
     const messages = document.getElementById('messages');
     const input = document.getElementById('input');
 
-    function addMessage(text, who = 'bot') {
+    function addMessage(html, who = 'bot') {
       const bubble = el('div', `bubble ${who}`);
-      bubble.innerHTML = text;
+      bubble.innerHTML = html;
       const time = el('span', 'time', new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}));
       bubble.appendChild(time);
       messages.appendChild(bubble);
@@ -185,7 +186,7 @@
       return `${s} – ${e} (Australia/Sydney)`;
     }
 
-    // ========= ICS Generation (iOS friendly) ========= //
+    // ========= ICS Generation (iOS friendly; no address) ========= //
     function pad(n){ return String(n).padStart(2, '0'); }
     function toICSLocal(dt){ return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`; }
 
@@ -195,12 +196,12 @@
       const DTSTART = toICSLocal(EVENT.startLocal);
       const DTEND = toICSLocal(EVENT.endLocal);
 
-      // VTIMEZONE block for Australia/Sydney. (DST not in effect on Aug 16 but included for compatibility.)
       const vtimezone = `BEGIN:VTIMEZONE\nTZID:Australia/Sydney\nX-LIC-LOCATION:Australia/Sydney\nBEGIN:STANDARD\nTZOFFSETFROM:+1100\nTZOFFSETTO:+1000\nTZNAME:AEST\nDTSTART:19700405T030000\nRRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=1SU\nEND:STANDARD\nBEGIN:DAYLIGHT\nTZOFFSETFROM:+1000\nTZOFFSETTO:+1100\nTZNAME:AEDT\nDTSTART:19701004T020000\nRRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=1SU\nEND:DAYLIGHT\nEND:VTIMEZONE`;
 
-      const description = `${EVENT.notes}\\n\\nVenue: ${EVENT.address}\\nDirections: https://www.google.com/maps/dir/?api=1&destination=${EVENT.googleMapsQuery}\\nMenu: ${EVENT.menuUrl}\\nRSVP: sms:${EVENT.rsvpPhone}`;
+      // LOCATION uses venue name only; DESCRIPTION contains a Google Maps search link (no address)
+      const description = `${EVENT.notes}\\n\\nVenue: ${EVENT.venue} (Coogee, NSW)\\nDirections: https://www.google.com/maps/search/?api=1&query=${EVENT.googleMapsQuery}\\nMenu: ${EVENT.menuUrl}\\nRSVP: sms:${EVENT.rsvpPhone}`;
 
-      const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Leo Birthday//Mimis Chatbot//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n${vtimezone}\nBEGIN:VEVENT\nUID:${uid}\nDTSTAMP:${dtstamp}\nDTSTART;TZID=Australia/Sydney:${DTSTART}\nDTEND;TZID=Australia/Sydney:${DTEND}\nSUMMARY:${escapeICS(EVENT.title)}\nLOCATION:${escapeICS(EVENT.address)}\nDESCRIPTION:${escapeICS(description)}\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+      const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Leo Birthday//Mimis Chatbot//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n${vtimezone}\nBEGIN:VEVENT\nUID:${uid}\nDTSTAMP:${dtstamp}\nDTSTART;TZID=Australia/Sydney:${DTSTART}\nDTEND;TZID=Australia/Sydney:${DTEND}\nSUMMARY:${escapeICS(EVENT.title)}\nLOCATION:${escapeICS(EVENT.venue)}\nDESCRIPTION:${escapeICS(description)}\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
       return ics;
     }
 
@@ -219,7 +220,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Birthday_Dinner_Mimis_2025-08-16.ics';
+        a.download = 'Leo_Birthday_Mimis_2025-08-16.ics';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -237,7 +238,7 @@
 
       // Location / time
       if (/\b(where|location|address|venue)\b/.test(text)) {
-        addMessage(`We’re at <strong>${EVENT.venue}</strong>, <em>${EVENT.address}</em>.<br><a class="link" href="${placeLink}" target="_blank" rel="noopener">Open in Google Maps</a>.`);
+        addMessage(`We’re at <strong>${EVENT.venue}</strong> in <em>Coogee, NSW</em>.<br><a class="link" href="${placeLink}" target="_blank" rel="noopener">Open in Google Maps</a>.`);
         return;
       }
       if (/(when|what time|date|start|end|schedule|time)/.test(text)) {
@@ -247,7 +248,7 @@
 
       // Directions
       if (/(how.*get|directions|route|navigate|way there|parking|transport)/.test(text)) {
-        addMessage(`Tap for directions: <a class="link" href="${mapsLink}" target="_blank" rel="noopener">Google Maps directions</a>.`);
+        addMessage(`Tap for directions: <a class="link" href="${mapsLink}" target="_blank" rel="noopener">Google Maps directions (destination set to "${EVENT.venue} Coogee NSW")</a>.`);
         return;
       }
 
@@ -273,7 +274,7 @@
       }
 
       // Fallback
-      addMessage("I can help with details, directions, the menu, RSVP, or a calendar invite. Try asking: ‘What’s the address?’ or ‘Show directions’." );
+      addMessage("I can help with details, directions, the menu, RSVP, or a calendar invite. Try asking: ‘What’s the venue?’ or ‘Show directions’." );
     }
 
     // ========= Wire up UI ========= //
@@ -294,7 +295,7 @@
     });
 
     const quick = [
-      'What\'s the address?',
+      'What\'s the venue?',
       'What time does it start?',
       'How do I get there?',
       'Show the menu',
@@ -305,7 +306,7 @@
     quick.forEach(q => { const chip = el('button','chip',q); chip.addEventListener('click', ()=>{ input.value = q; document.getElementById('send').click(); }); quickWrap.appendChild(chip); });
 
     // Greeting
-    addMessage(`Hey! I’m your concierge for <strong>${EVENT.title}</strong> on <strong>${fmtDateRange(EVENT.startLocal, EVENT.endLocal)}</strong> at <em>${EVENT.address}</em>. Ask me for directions, the menu, RSVP, or a calendar invite anytime ✨`);
+    addMessage(`Hey! I’m your concierge for <strong>${EVENT.title}</strong> on <strong>${fmtDateRange(EVENT.startLocal, EVENT.endLocal)}</strong> at <em>${EVENT.placeHint}</em>. Ask me for directions, the menu, RSVP, or a calendar invite anytime ✨`);
   </script>
 </body>
 </html>

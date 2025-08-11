@@ -1,17 +1,18 @@
-# Mimi's Birthday Dinner Chatbot
+# Mimi's Birthday Dinner Chatbot (Address Removed)
 
-Single-file static site (index.html) with:
-- Event details (Mimi’s, 130a Beach St, Coogee NSW 2034; Sat 16 Aug 2025, 6:30–9:30 PM)
-- Google Maps directions
+This is a single-file static site (`index.html`) for Leo's birthday at Mimi’s.
+It includes:
+- Event details (no street address shown)
+- Google Maps directions to the venue by name
 - Menu link
 - One-tap RSVP via SMS to +61 414 428 118
-- iOS-friendly .ics generator
+- iOS-friendly .ics generator (location is the venue name only)
 
 ## Run locally
 Just open `index.html` in any browser.
 
 ## Deploy to GitHub Pages (Web UI)
-1. Create a new public repo on GitHub (e.g. `mimis-birthday`).
+1. Create a new public repo on GitHub (e.g. `mimis-birthday-noaddress`).
 2. Upload `index.html`, `.nojekyll`, and this `README.md` to the repository root.
 3. In the repo, go to **Settings → Pages**.
 4. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
@@ -21,16 +22,13 @@ Just open `index.html` in any browser.
 ## Deploy with GitHub CLI (gh)
 ```bash
 # In this folder:
-gh repo create mimis-birthday --public --source=. --remote=origin --push
-# Enable Pages (Classic) – or do this in Settings → Pages
-gh api -X PUT repos/:owner/mimis-birthday/pages -f build_type=legacy || true
-# Set the source to main branch / root
-gh api -X POST repos/:owner/mimis-birthday/pages/builds || true
+gh repo create mimis-birthday-noaddress --public --source=. --remote=origin --push
+# Then enable Pages in Settings → Pages (Branch: main, Folder: / (root))
 ```
 
-## Deploy to Netlify (no login via CLI)
+## Deploy to Netlify
 - Drag-and-drop this folder at https://app.netlify.com/drop
 
 ## Deploy to Vercel
 1. Install Vercel CLI: `npm i -g vercel`
-2. Run: `vercel --yes --name mimis-birthday --prod`
+2. Run: `vercel --yes --name mimis-birthday-noaddress --prod`
