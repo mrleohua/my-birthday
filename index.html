@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leo’s Birthday @ Mimi’s – 16 Aug 2025</title>
+  <meta name="description" content="Chatbot with event details, directions, menu link, RSVP via SMS, and iOS calendar invite." />
+  <style>
+    :root {
+      /* Subtle, party-friendly pastels */
+      --bg: #f8d7e8;        /* soft pink */
+      --panel: #f1b6d1;     /* rose */
+      --panel-2: #e89fbe;   /* mauve */
+      --text: #2e2e2e;      /* near-black */
+      --muted: #5f5f5f;     /* muted text */
+      --accent: #6ec6ff;    /* soft blue */
+      --accent-2: #ffd166;  /* honey */
+      --success: #9dd47a;   /* mint */
+      --warning: #ffb347;   /* apricot */
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 80% -10%, #f1b6d1aa, transparent), var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .app {
+      width: min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    header {
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, #f1b6d1, #e89fbe);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    header .title { display: flex; gap: 12px; align-items: center; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    h1 { font-size: 18px; margin: 0; letter-spacing: 0.2px; }
+    .meta { color: var(--muted); font-size: 12px; }
+
+    .content { display: grid; grid-template-columns: 340px 1fr; }
+    @media (max-width: 860px) { .content { grid-template-columns: 1fr; } }
+
+    .sidebar {
+      padding: 20px;
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border-right: 1px solid rgba(0,0,0,0.06);
+    }
+    .card {
+      background: rgba(255,255,255,0.66);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h2 { margin: 0 0 8px; font-size: 16px; }
+    .kv { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .kv strong { color: var(--text); }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .btn {
+      appearance: none; border: 0; cursor: pointer;
+      padding: 10px 14px; border-radius: 12px; font-weight: 600; letter-spacing: .2px;
+      background: linear-gradient(180deg, #f1b6d1, #e89fbe);
+      color: var(--text);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .btn.primary { background: linear-gradient(180deg, #ffd166, #ffb347); color: #000; }
+    .btn.accent  { background: linear-gradient(180deg, #a2d2ff, #6ec6ff); color: #000; }
+    .btn.success { background: linear-gradient(180deg, #c8e6a0, #9dd47a); color: #000; }
+
+    .chat { display: grid; grid-template-rows: 1fr auto; min-height: 540px; }
+    .messages { padding: 22px; overflow: auto; max-height: 62vh; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+    .bubble { max-width: 80%; padding: 12px 14px; border-radius: 14px; line-height: 1.5; }
+    .bubble.user { align-self: flex-end; background: #f8d7e8; border: 1px solid #f1b6d1; color: var(--text); }
+    .bubble.bot  { align-self: flex-start; background: #fce4ec; border: 1px solid #f1b6d1; color: var(--text); }
+    .bubble .time { display:block; margin-top:4px; font-size: 11px; color: var(--muted); }
+
+    .composer { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 14px 18px; border-top: 1px solid rgba(0,0,0,0.06); background: #f6c6da; }
+    .input { width: 100%; padding: 12px 14px; border-radius: 12px; background: #fff; color: var(--text); border: 1px solid rgba(0,0,0,0.12); }
+
+    .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .quick .chip { padding: 8px 10px; background: #f8d7e8; border: 1px solid rgba(0,0,0,0.06); border-radius: 999px; cursor: pointer; font-size: 12px; color: var(--text); }
+
+    .footer-note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    a.link { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Birthday Dinner Chatbot">
+    <header>
+      <div class="title">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <h1>Leo’s Birthday @ Mimi’s</h1>
+          <div class="meta">Chatbot assistant for your guests · Sat 16 Aug 2025</div>
+        </div>
+      </div>
+      <button class="btn primary" id="downloadIcsTop" title="Add to Calendar">+ Calendar</button>
+    </header>
+
+    <div class="content">
+      <aside class="sidebar">
+        <div class="card">
+          <h2>Event details</h2>
+          <div class="kv"><strong>When:</strong> Sat 16 Aug 2025, 6:30–9:30 PM</div>
+          <div class="kv"><strong>Where:</strong> Mimi’s, 130a Beach St, Coogee NSW 2034</div>
+          <div class="kv"><strong>Dress:</strong> Smart casual</div>
+          <div class="btn-row">
+            <a id="mapsBtn" class="btn accent" target="_blank" rel="noopener">Open Google Maps</a>
+            <a id="menuBtn" class="btn" target="_blank" rel="noopener">View Menu</a>
+            <button id="rsvpBtn" class="btn success">RSVP via SMS</button>
+            <button id="downloadIcs" class="btn primary">Add to iOS Calendar</button>
+          </div>
+          <div class="footer-note">Tip: On iPhone, the RSVP button opens Messages with a prefilled text.</div>
+        </div>
+
+        <div class="card">
+          <h2>Try asking…</h2>
+          <div class="quick" id="quickChips"></div>
+        </div>
+      </aside>
+
+      <main class="chat">
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="composer">
+          <input id="input" class="input" placeholder="Ask about the dinner, directions, menu, RSVP, or calendar…" />
+          <button id="send" class="btn">Send</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ========= Config ========= //
+    const EVENT = {
+      title: "Leo’s Birthday Dinner @ Mimi’s",
+      venue: "Mimi’s",
+      address: "Mimi’s, 130a Beach St, Coogee NSW 2034",
+      googleMapsQuery: encodeURIComponent("Mimi’s, 130a Beach St, Coogee NSW 2034"),
+      startLocal: new Date("2025-08-16T18:30:00+10:00"), // Australia/Sydney (AEST)
+      endLocal: new Date("2025-08-16T21:30:00+10:00"),
+      hostName: "Leo",
+      rsvpPhone: "+61414428118",
+      menuUrl: "https://merivale.com/venues/mimis/menu/",
+      notes: "Join us for a casual, delicious evening by the water. Please let us know any dietary needs."
+    };
+
+    // Derived map links
+    const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${EVENT.googleMapsQuery}`;
+    const placeLink = `https://www.google.com/maps/search/?api=1&query=${EVENT.googleMapsQuery}`;
+
+    // ========= UI Helpers ========= //
+    const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('input');
+
+    function addMessage(text, who = 'bot') {
+      const bubble = el('div', `bubble ${who}`);
+      bubble.innerHTML = text;
+      const time = el('span', 'time', new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}));
+      bubble.appendChild(time);
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function fmtDateRange(start, end) {
+      const opts = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+      const s = new Intl.DateTimeFormat('en-AU', opts).format(start);
+      const e = new Intl.DateTimeFormat('en-AU', { hour: 'numeric', minute: '2-digit' }).format(end);
+      return `${s} – ${e} (Australia/Sydney)`;
+    }
+
+    // ========= ICS Generation (iOS friendly) ========= //
+    function pad(n){ return String(n).padStart(2, '0'); }
+    function toICSLocal(dt){ return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`; }
+
+    function buildICS(){
+      const uid = `leo-mimis-${Date.now()}@mimis-bot`;
+      const dtstamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+      const DTSTART = toICSLocal(EVENT.startLocal);
+      const DTEND = toICSLocal(EVENT.endLocal);
+
+      // VTIMEZONE block for Australia/Sydney. (DST not in effect on Aug 16 but included for compatibility.)
+      const vtimezone = `BEGIN:VTIMEZONE\nTZID:Australia/Sydney\nX-LIC-LOCATION:Australia/Sydney\nBEGIN:STANDARD\nTZOFFSETFROM:+1100\nTZOFFSETTO:+1000\nTZNAME:AEST\nDTSTART:19700405T030000\nRRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=1SU\nEND:STANDARD\nBEGIN:DAYLIGHT\nTZOFFSETFROM:+1000\nTZOFFSETTO:+1100\nTZNAME:AEDT\nDTSTART:19701004T020000\nRRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=1SU\nEND:DAYLIGHT\nEND:VTIMEZONE`;
+
+      const description = `${EVENT.notes}\\n\\nVenue: ${EVENT.address}\\nDirections: https://www.google.com/maps/dir/?api=1&destination=${EVENT.googleMapsQuery}\\nMenu: ${EVENT.menuUrl}\\nRSVP: sms:${EVENT.rsvpPhone}`;
+
+      const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Leo Birthday//Mimis Chatbot//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n${vtimezone}\nBEGIN:VEVENT\nUID:${uid}\nDTSTAMP:${dtstamp}\nDTSTART;TZID=Australia/Sydney:${DTSTART}\nDTEND;TZID=Australia/Sydney:${DTEND}\nSUMMARY:${escapeICS(EVENT.title)}\nLOCATION:${escapeICS(EVENT.address)}\nDESCRIPTION:${escapeICS(description)}\nSTATUS:CONFIRMED\nEND:VEVENT\nEND:VCALENDAR`;
+      return ics;
+    }
+
+    function escapeICS(text){
+      return String(text)
+        .replace(/\\/g, "\\\\")
+        .replace(/\n/g, "\\n")
+        .replace(/,/g, "\\,")
+        .replace(/;/g, "\\;");
+    }
+
+    function downloadICS(){
+      try {
+        const data = buildICS();
+        const blob = new Blob([data], {type: 'text/calendar;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Birthday_Dinner_Mimis_2025-08-16.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error(e);
+        addMessage('Sorry, I couldn\'t generate the calendar file. Try again or ask me for help.', 'bot');
+      }
+    }
+
+    // ========= Simple NLU ========= //
+    function handleQuery(q){
+      const text = q.trim().toLowerCase();
+      if (!text) return;
+
+      // Location / time
+      if (/\b(where|location|address|venue)\b/.test(text)) {
+        addMessage(`We’re at <strong>${EVENT.venue}</strong>, <em>${EVENT.address}</em>.<br><a class="link" href="${placeLink}" target="_blank" rel="noopener">Open in Google Maps</a>.`);
+        return;
+      }
+      if (/(when|what time|date|start|end|schedule|time)/.test(text)) {
+        addMessage(`It’s on <strong>${fmtDateRange(EVENT.startLocal, EVENT.endLocal)}</strong>.`);
+        return;
+      }
+
+      // Directions
+      if (/(how.*get|directions|route|navigate|way there|parking|transport)/.test(text)) {
+        addMessage(`Tap for directions: <a class="link" href="${mapsLink}" target="_blank" rel="noopener">Google Maps directions</a>.`);
+        return;
+      }
+
+      // Menu
+      if (/menu|food|drinks?|wine|dish|dietary/.test(text)) {
+        addMessage(`Here’s the menu: <a class="link" href="${EVENT.menuUrl}" target="_blank" rel="noopener">Mimi’s menu (merivale.com)</a>. If you have dietary requirements, reply “RSVP” and include details.`);
+        return;
+      }
+
+      // RSVP
+      if (/\brsvp\b|attending|attendance|confirm|\byes\b|\bno\b|maybe/.test(text)) {
+        const smsBody = encodeURIComponent(`Hi ${EVENT.hostName}, it’s [Your Name]. RSVP: I can make it!`);
+        const smsLink = `sms:${EVENT.rsvpPhone}?&body=${smsBody}`;
+        addMessage(`Great! Use this to RSVP: <a class="link" href="${smsLink}">Text ${EVENT.hostName}</a>.`);
+        return;
+      }
+
+      // Calendar
+      if (/calendar|invite|ics|add.*(calendar|iphone|ios)/.test(text)) {
+        downloadICS();
+        addMessage(`I’ve prepared an iCalendar file. If it didn’t download automatically, click <a class="link" href="#" onclick="downloadICS();return false;">download invite</a>.`);
+        return;
+      }
+
+      // Fallback
+      addMessage("I can help with details, directions, the menu, RSVP, or a calendar invite. Try asking: ‘What’s the address?’ or ‘Show directions’." );
+    }
+
+    // ========= Wire up UI ========= //
+    document.getElementById('mapsBtn').href = mapsLink;
+    document.getElementById('menuBtn').href = EVENT.menuUrl;
+    document.getElementById('rsvpBtn').addEventListener('click', () => {
+      const smsBody = encodeURIComponent(`Hi ${EVENT.hostName}, it’s [Your Name]. RSVP: I can make it!`);
+      window.location.href = `sms:${EVENT.rsvpPhone}?&body=${smsBody}`;
+    });
+    document.getElementById('downloadIcs').addEventListener('click', downloadICS);
+    document.getElementById('downloadIcsTop').addEventListener('click', downloadICS);
+
+    document.getElementById('send').addEventListener('click', () => {
+      const q = input.value; if (!q) return; addMessage(q, 'user'); input.value=''; setTimeout(()=>handleQuery(q), 160);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); document.getElementById('send').click(); }
+    });
+
+    const quick = [
+      'What\'s the address?',
+      'What time does it start?',
+      'How do I get there?',
+      'Show the menu',
+      'RSVP',
+      'Add to iPhone calendar'
+    ];
+    const quickWrap = document.getElementById('quickChips');
+    quick.forEach(q => { const chip = el('button','chip',q); chip.addEventListener('click', ()=>{ input.value = q; document.getElementById('send').click(); }); quickWrap.appendChild(chip); });
+
+    // Greeting
+    addMessage(`Hey! I’m your concierge for <strong>${EVENT.title}</strong> on <strong>${fmtDateRange(EVENT.startLocal, EVENT.endLocal)}</strong> at <em>${EVENT.address}</em>. Ask me for directions, the menu, RSVP, or a calendar invite anytime ✨`);
+  </script>
+</body>
+</html>
