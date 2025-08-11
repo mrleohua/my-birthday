@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leo’s Birthday @ Mimi’s – 16 Aug 2025</title>
+  <title>Leo’s Birthday @ Mimi’s – 17 Aug 2025</title>
   <meta name="description" content="Chatbot with event details, directions, menu link, RSVP via SMS, and iOS calendar invite." />
   <style>
     :root {
@@ -107,7 +107,7 @@
         <div class="dot" aria-hidden="true"></div>
         <div>
           <h1>Leo’s Birthday @ Mimi’s</h1>
-          <div class="meta">Chatbot assistant for your guests · Sat 16 Aug 2025</div>
+          <div class="meta">Chatbot assistant for your guests · Sun 17 Aug 2025</div>
         </div>
       </div>
       <button class="btn primary" id="downloadIcsTop" title="Add to Calendar">+ Calendar</button>
@@ -117,7 +117,7 @@
       <aside class="sidebar">
         <div class="card">
           <h2>Event details</h2>
-          <div class="kv"><strong>When:</strong> Sat 16 Aug 2025, 6:30–9:30 PM</div>
+          <div class="kv"><strong>When:</strong> Sun 17 Aug 2025, 6:30–9:30 PM</div>
           <div class="kv"><strong>Where:</strong> Mimi’s (Coogee, NSW)</div>
           <div class="kv"><strong>Dress:</strong> Smart casual</div>
           <div class="btn-row">
@@ -153,8 +153,8 @@
       // No street address stored or displayed
       placeHint: "Mimi’s (Coogee, NSW)",
       googleMapsQuery: encodeURIComponent("Mimi’s Coogee NSW"),
-      startLocal: new Date("2025-08-16T18:30:00+10:00"), // Australia/Sydney (AEST)
-      endLocal: new Date("2025-08-16T21:30:00+10:00"),
+      startLocal: new Date("2025-08-17T18:30:00+10:00"), // Australia/Sydney (AEST)
+      endLocal: new Date("2025-08-17T21:30:00+10:00"),
       hostName: "Leo",
       rsvpPhone: "+61414428118",
       menuUrl: "https://merivale.com/venues/mimis/menu/",
@@ -207,10 +207,10 @@
 
     function escapeICS(text){
       return String(text)
-        .replace(/\\/g, "\\\\")
-        .replace(/\n/g, "\\n")
-        .replace(/,/g, "\\,")
-        .replace(/;/g, "\\;");
+        .replace(/\\\\/g, "\\\\\\\\")
+        .replace(/\n/g, "\\\\n")
+        .replace(/,/g, "\\\\,")
+        .replace(/;/g, "\\\\;");
     }
 
     function downloadICS(){
@@ -220,7 +220,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Leo_Birthday_Mimis_2025-08-16.ics';
+        a.download = 'Leo_Birthday_Mimis_2025-08-17.ics';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -238,7 +238,7 @@
 
       // Location / time
       if (/\b(where|location|address|venue)\b/.test(text)) {
-        addMessage(`We’re at <strong>${EVENT.venue}</strong> in <em>Coogee, NSW</em>.<br><a class="link" href="${placeLink}" target="_blank" rel="noopener">Open in Google Maps</a>.`);
+        addMessage(`We’re at <strong>${EVENT.venue}</strong> in <em>Coogee, NSW</em>.<br><a class=\"link\" href=\"${placeLink}\" target=\"_blank\" rel=\"noopener\">Open in Google Maps</a>.`);
         return;
       }
       if (/(when|what time|date|start|end|schedule|time)/.test(text)) {
@@ -248,13 +248,13 @@
 
       // Directions
       if (/(how.*get|directions|route|navigate|way there|parking|transport)/.test(text)) {
-        addMessage(`Tap for directions: <a class="link" href="${mapsLink}" target="_blank" rel="noopener">Google Maps directions (destination set to "${EVENT.venue} Coogee NSW")</a>.`);
+        addMessage(`Tap for directions: <a class=\"link\" href=\"${mapsLink}\" target=\"_blank\" rel=\"noopener\">Google Maps directions (destination set to \"${EVENT.venue} Coogee NSW\")</a>.`);
         return;
       }
 
       // Menu
       if (/menu|food|drinks?|wine|dish|dietary/.test(text)) {
-        addMessage(`Here’s the menu: <a class="link" href="${EVENT.menuUrl}" target="_blank" rel="noopener">Mimi’s menu (merivale.com)</a>. If you have dietary requirements, reply “RSVP” and include details.`);
+        addMessage(`Here’s the menu: <a class=\"link\" href=\"${EVENT.menuUrl}\" target=\"_blank\" rel=\"noopener\">Mimi’s menu (merivale.com)</a>. If you have dietary requirements, reply “RSVP” and include details.`);
         return;
       }
 
@@ -262,14 +262,14 @@
       if (/\brsvp\b|attending|attendance|confirm|\byes\b|\bno\b|maybe/.test(text)) {
         const smsBody = encodeURIComponent(`Hi ${EVENT.hostName}, it’s [Your Name]. RSVP: I can make it!`);
         const smsLink = `sms:${EVENT.rsvpPhone}?&body=${smsBody}`;
-        addMessage(`Great! Use this to RSVP: <a class="link" href="${smsLink}">Text ${EVENT.hostName}</a>.`);
+        addMessage(`Great! Use this to RSVP: <a class=\"link\" href=\"${smsLink}\">Text ${EVENT.hostName}</a>.`);
         return;
       }
 
       // Calendar
       if (/calendar|invite|ics|add.*(calendar|iphone|ios)/.test(text)) {
         downloadICS();
-        addMessage(`I’ve prepared an iCalendar file. If it didn’t download automatically, click <a class="link" href="#" onclick="downloadICS();return false;">download invite</a>.`);
+        addMessage(`I’ve prepared an iCalendar file. If it didn’t download automatically, click <a class=\"link\" href=\"#\" onclick=\"downloadICS();return false;\">download invite</a>.`);
         return;
       }
 
